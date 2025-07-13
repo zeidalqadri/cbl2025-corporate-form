@@ -341,11 +341,25 @@ const CBLRegistrationForm = () => {
       setPaymentFile(null);
       setIsValidated(false);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error);
+      
+      let errorMessage = "There was an error submitting your registration. Please try again.";
+      
+      // Handle specific database constraint violations
+      if (error?.message?.includes('valid_email')) {
+        errorMessage = "Please check that all email addresses are in valid format (e.g., name@company.com).";
+      } else if (error?.message?.includes('valid_phone')) {
+        errorMessage = "Please check that all phone numbers are in valid format (e.g., +60123456789 or 0123456789).";
+      } else if (error?.message?.includes('affiliation')) {
+        errorMessage = "Player affiliation must match one of the company names.";
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Registration failed",
-        description: "There was an error submitting your registration. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
