@@ -183,12 +183,23 @@ const CBLRegistrationForm = () => {
     }
   };
 
+  const isWorkEmail = (email: string) => {
+    const personalDomains = [
+      'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
+      'icloud.com', 'protonmail.com', 'aol.com', 'me.com', 'msn.com'
+    ];
+    
+    const domain = email.split('@')[1]?.toLowerCase();
+    return domain && !personalDomains.includes(domain);
+  };
+
   const isFormValid = () => {
     const teamInfoValid = teamName.trim() && company1.trim() && (!hasSecondCompany || company2.trim());
     const playersValid = players.every(player => 
       player.fullName.trim() && 
       player.icPassport.trim() && 
       player.email.trim() && 
+      isWorkEmail(player.email) &&
       player.phone.trim() && 
       player.affiliation
     );
@@ -484,15 +495,21 @@ const CBLRegistrationForm = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor={`email-${player.id}`}>Email *</Label>
+                      <Label htmlFor={`email-${player.id}`}>Work Email *</Label>
                       <Input
                         id={`email-${player.id}`}
                         type="email"
                         value={player.email}
                         onChange={(e) => updatePlayer(player.id, 'email', e.target.value)}
-                        placeholder="Enter email address"
+                        placeholder="Enter work email address"
+                        className={player.email && !isWorkEmail(player.email) ? "border-destructive" : ""}
                         required
                       />
+                      {player.email && !isWorkEmail(player.email) && (
+                        <p className="text-xs text-destructive mt-1">
+                          Please use a work email (no personal emails like Gmail, Yahoo, etc.)
+                        </p>
+                      )}
                     </div>
                     
                     <div>
