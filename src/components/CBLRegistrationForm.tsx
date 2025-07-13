@@ -53,11 +53,12 @@ const CBLRegistrationForm = () => {
         hasSecondCompany,
         company2,
         players,
-        isValidated
+        isValidated,
+        paymentFileName: paymentFile?.name || null
       };
       localStorage.setItem('cbl_registration_data', JSON.stringify(formData));
     }
-  }, [user, teamName, company1, hasSecondCompany, company2, players, isValidated]);
+  }, [user, teamName, company1, hasSecondCompany, company2, players, isValidated, paymentFile]);
 
   const loadExistingRegistration = async () => {
     if (!user?.id) return;
@@ -94,6 +95,18 @@ const CBLRegistrationForm = () => {
           }));
         setPlayers(playersData);
         
+        // Create a mock file object if payment file exists
+        if (registration.payment_file_name) {
+          const mockFile = new File([], registration.payment_file_name, { 
+            type: 'application/octet-stream' 
+          });
+          Object.defineProperty(mockFile, 'name', { 
+            value: registration.payment_file_name,
+            writable: false 
+          });
+          setPaymentFile(mockFile);
+        }
+        
         toast({
           title: "Registration loaded",
           description: "We found your existing registration and loaded your data.",
@@ -109,6 +122,18 @@ const CBLRegistrationForm = () => {
           setCompany2(formData.company2 || "");
           setPlayers(formData.players || [{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "employee" }]);
           setIsValidated(formData.isValidated || false);
+          
+          // Restore payment file name if exists
+          if (formData.paymentFileName) {
+            const mockFile = new File([], formData.paymentFileName, { 
+              type: 'application/octet-stream' 
+            });
+            Object.defineProperty(mockFile, 'name', { 
+              value: formData.paymentFileName,
+              writable: false 
+            });
+            setPaymentFile(mockFile);
+          }
         }
       }
     } catch (error) {
