@@ -77,6 +77,14 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex flex-col items-center mb-4">
+            <img 
+              src="/lovable-uploads/cfe312a1-b4c2-4555-a995-829d97c3bc3d.png" 
+              alt="CBL Corporate Basketball League Logo" 
+              className="h-24 w-auto drop-shadow-lg mb-2"
+            />
+            <div className="text-2xl font-bold text-primary">2025</div>
+          </div>
           <CardTitle className="text-2xl font-bold">CBL 2025</CardTitle>
           <CardDescription>Corporate Basketball League Registration</CardDescription>
         </CardHeader>
