@@ -99,8 +99,8 @@ const Auth = () => {
               className="h-24 w-auto drop-shadow-lg mb-2"
             />
             <div className="text-2xl font-bold text-primary">2025</div>
+            <div className="text-lg font-semibold text-muted-foreground mt-1">Corporate Edition</div>
           </div>
-          <CardTitle className="text-2xl font-bold">CBL 2025</CardTitle>
           <CardDescription>Corporate Basketball League Registration</CardDescription>
         </CardHeader>
         <CardContent>
