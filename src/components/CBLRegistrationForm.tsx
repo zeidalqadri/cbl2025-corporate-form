@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, Plus, Upload, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import cblLogo from "@/assets/cbl-logo.png";
 
 interface Player {
   id: string;
@@ -232,14 +231,15 @@ const CBLRegistrationForm = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header with Logo */}
         <div className="text-center mb-8">
-          <img 
-            src={cblLogo} 
-            alt="CBL 2025 Corporate Edition Logo" 
-            className="mx-auto mb-6 h-32 w-auto drop-shadow-lg"
-          />
-          <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent mb-2">
-            CBL 2025 Corporate Edition
-          </h1>
+          <div className="flex flex-col items-center">
+            <img 
+              src="/lovable-uploads/cfe312a1-b4c2-4555-a995-829d97c3bc3d.png" 
+              alt="CBL Corporate Basketball League Logo" 
+              className="h-32 w-auto drop-shadow-lg mb-2"
+            />
+            <div className="text-4xl font-bold text-primary mb-4">2025</div>
+          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Corporate Edition</h1>
           <p className="text-xl text-muted-foreground">Team Registration Form</p>
           <div className="mt-4 bg-accent/30 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-sm text-foreground">
