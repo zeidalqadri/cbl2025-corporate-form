@@ -54,6 +54,19 @@ const Auth = () => {
     const password = formData.get('password') as string;
     const fullName = formData.get('fullName') as string;
 
+    // Validate work email (no personal domains)
+    const personalDomains = [
+      'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com',
+      'protonmail.com', 'tutanota.com', 'zoho.com', 'yandex.com', 'mail.com'
+    ];
+    
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    if (personalDomains.includes(emailDomain)) {
+      setError('Please use a corporate/work email address. Personal email domains are not allowed for this corporate league.');
+      setIsLoading(false);
+      return;
+    }
+
     const { error } = await signUp(email, password, fullName);
     
     if (error) {
