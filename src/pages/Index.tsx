@@ -1,7 +1,13 @@
 import CBLRegistrationForm from "@/components/CBLRegistrationForm";
+import Header from "@/components/Header";
 
 const Index = () => {
-  return <CBLRegistrationForm />;
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <CBLRegistrationForm />
+    </div>
+  );
 };
 
 export default Index;

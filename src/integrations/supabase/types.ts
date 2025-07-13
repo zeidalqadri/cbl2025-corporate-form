@@ -1242,6 +1242,33 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          company: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seasons: {
         Row: {
           created_at: string | null
@@ -1409,6 +1436,7 @@ export type Database = {
           team_name: string
           total_players: number | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           company_1: string
@@ -1424,6 +1452,7 @@ export type Database = {
           team_name: string
           total_players?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           company_1?: string
@@ -1439,6 +1468,7 @@ export type Database = {
           team_name?: string
           total_players?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1551,6 +1581,27 @@ export type Database = {
           start_date?: string | null
           status?: string | null
           venue?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -2217,6 +2268,13 @@ export type Database = {
       gidx_out: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: boolean
       }
       json: {
         Args: { "": unknown }
@@ -3523,12 +3581,20 @@ export type Database = {
         }
         Returns: string
       }
+      validate_email: {
+        Args: { email: string }
+        Returns: boolean
+      }
       validate_malaysian_nric: {
         Args: { nric: string }
         Returns: boolean
       }
       validate_moe_school_code: {
         Args: { code: string }
+        Returns: boolean
+      }
+      validate_phone: {
+        Args: { phone: string }
         Returns: boolean
       }
       validate_ppm_number: {
@@ -3563,6 +3629,7 @@ export type Database = {
         | "achievement"
         | "system"
       org_identifier_type: "MOE" | "SSM" | "PPM" | "OTHER"
+      user_role: "admin" | "user"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -3723,6 +3790,7 @@ export const Constants = {
         "system",
       ],
       org_identifier_type: ["MOE", "SSM", "PPM", "OTHER"],
+      user_role: ["admin", "user"],
     },
   },
 } as const
