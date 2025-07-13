@@ -375,7 +375,7 @@ const CBLRegistrationForm = () => {
           <div className="flex flex-col items-center">
             <img 
               src="/lovable-uploads/cfe312a1-b4c2-4555-a995-829d97c3bc3d.png" 
-              alt="CBL Corporate Basketball League Logo" 
+              alt="CBL Logo" 
               className="h-32 w-auto drop-shadow-lg mb-2"
             />
             <div className="text-4xl font-bold text-primary mb-4">2025</div>
