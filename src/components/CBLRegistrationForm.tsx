@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, Plus, Upload, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import cblLogo from "@/assets/cbl-logo.png";
 
 interface Player {
   id: string;
@@ -33,13 +34,18 @@ const CBLRegistrationForm = () => {
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [isValidated, setIsValidated] = useState(false);
 
-  const affiliationOptions = [
-    "Company 1 Employee",
-    "Company 2 Employee", 
-    "External Player",
-    "Contractor",
-    "Partner"
-  ];
+  // Dynamic affiliation options based on companies
+  const getAffiliationOptions = () => {
+    const options = [
+      { value: "company_1", label: `${company1 || "Company 1"} Employee` }
+    ];
+    
+    if (hasSecondCompany && company2) {
+      options.push({ value: "company_2", label: `${company2} Employee` });
+    }
+    
+    return options;
+  };
 
   const addPlayer = () => {
     if (players.length < 15) {
@@ -162,13 +168,14 @@ const CBLRegistrationForm = () => {
       if (regError) throw regError;
 
       // Insert players
-      const playersData = players.map(player => ({
-        team_registration_id: registration.id,
+      const playersData = players.map((player, index) => ({
+        registration_id: registration.id,
         full_name: player.fullName,
         ic_passport: player.icPassport,
         email: player.email,
         phone: player.phone,
-        affiliation: player.affiliation
+        affiliation: player.affiliation,
+        player_order: index + 1
       }));
 
       const { error: playersError } = await supabase
@@ -176,6 +183,23 @@ const CBLRegistrationForm = () => {
         .insert(playersData);
 
       if (playersError) throw playersError;
+
+      // Update total players count
+      await supabase
+        .from('team_registrations')
+        .update({ 
+          total_players: players.length,
+          payment_file_size: paymentFile?.size || null 
+        })
+        .eq('id', registration.id);
+
+      // Sync to Google Sheets (async, don't wait for completion)
+      supabase.functions.invoke('sync-to-google-sheets', {
+        body: { registrationId: registration.id }
+      }).catch(error => {
+        console.error('Google Sheets sync failed:', error);
+        // Don't show error to user, this is background operation
+      });
 
       toast({
         title: "Registration successful!",
@@ -209,12 +233,20 @@ const CBLRegistrationForm = () => {
         {/* Header with Logo */}
         <div className="text-center mb-8">
           <img 
-            src="/lovable-uploads/2a6a1d65-1493-45a0-a60a-d8672698ba40.png" 
-            alt="CBL Logo" 
-            className="mx-auto mb-6 h-24 w-auto"
+            src={cblLogo} 
+            alt="CBL 2025 Corporate Edition Logo" 
+            className="mx-auto mb-6 h-32 w-auto drop-shadow-lg"
           />
-          <h1 className="text-4xl font-bold text-foreground mb-2">CBL 2025 Corporate Edition</h1>
+          <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent mb-2">
+            CBL 2025 Corporate Edition
+          </h1>
           <p className="text-xl text-muted-foreground">Team Registration Form</p>
+          <div className="mt-4 bg-accent/30 rounded-lg p-4 max-w-2xl mx-auto">
+            <p className="text-sm text-foreground">
+              🏀 Register your corporate team for Malaysia's premier basketball league! 
+              Complete all sections to secure your spot in CBL 2025.
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -360,9 +392,9 @@ const CBLRegistrationForm = () => {
                           <SelectValue placeholder="Select player affiliation" />
                         </SelectTrigger>
                         <SelectContent>
-                          {affiliationOptions.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
+                          {getAffiliationOptions().map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
                             </SelectItem>
                           ))}
                         </SelectContent>

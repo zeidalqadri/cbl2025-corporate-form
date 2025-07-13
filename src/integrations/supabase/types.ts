@@ -1350,6 +1350,98 @@ export type Database = {
         }
         Relationships: []
       }
+      team_registration_players: {
+        Row: {
+          affiliation: string
+          created_at: string
+          email: string
+          full_name: string
+          ic_passport: string
+          id: string
+          phone: string
+          player_order: number
+          registration_id: string
+        }
+        Insert: {
+          affiliation: string
+          created_at?: string
+          email: string
+          full_name: string
+          ic_passport: string
+          id?: string
+          phone: string
+          player_order: number
+          registration_id: string
+        }
+        Update: {
+          affiliation?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          ic_passport?: string
+          id?: string
+          phone?: string
+          player_order?: number
+          registration_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_registration_players_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "team_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_registrations: {
+        Row: {
+          company_1: string
+          company_2: string | null
+          created_at: string
+          google_sheet_synced: boolean | null
+          has_second_company: boolean | null
+          id: string
+          payment_file_name: string | null
+          payment_file_size: number | null
+          payment_file_url: string | null
+          status: string | null
+          team_name: string
+          total_players: number | null
+          updated_at: string
+        }
+        Insert: {
+          company_1: string
+          company_2?: string | null
+          created_at?: string
+          google_sheet_synced?: boolean | null
+          has_second_company?: boolean | null
+          id?: string
+          payment_file_name?: string | null
+          payment_file_size?: number | null
+          payment_file_url?: string | null
+          status?: string | null
+          team_name: string
+          total_players?: number | null
+          updated_at?: string
+        }
+        Update: {
+          company_1?: string
+          company_2?: string | null
+          created_at?: string
+          google_sheet_synced?: boolean | null
+          has_second_company?: boolean | null
+          id?: string
+          payment_file_name?: string | null
+          payment_file_size?: number | null
+          payment_file_url?: string | null
+          status?: string | null
+          team_name?: string
+          total_players?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       teams: {
         Row: {
           age_group: string | null
