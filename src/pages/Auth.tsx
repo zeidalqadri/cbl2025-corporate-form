@@ -35,7 +35,8 @@ const Auth = () => {
     const { error } = await signIn(email, password);
     
     if (error) {
-      setError(error.message);
+      console.error('Sign in error:', error);
+      setError(error.message || error.toString() || 'Sign in failed. Please try again.');
     } else {
       navigate('/', { replace: true });
     }
@@ -70,7 +71,8 @@ const Auth = () => {
     const { error } = await signUp(email, password, fullName);
     
     if (error) {
-      setError(error.message);
+      console.error('Sign up error:', error);
+      setError(error.message || error.toString() || 'Sign up failed. Please try again.');
     } else {
       setSuccess('Please check your email to confirm your account.');
     }
