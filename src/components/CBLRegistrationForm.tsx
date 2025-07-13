@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus, Upload, FileText } from "lucide-react";
+import { Trash2, Plus, Upload, FileText, Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,6 +22,12 @@ const CBLRegistrationForm = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Email collection step
+  const [step, setStep] = useState<'email' | 'form'>('email');
+  const [userEmail, setUserEmail] = useState("");
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [existingRegistrationId, setExistingRegistrationId] = useState<string | null>(null);
+  
   // Form state
   const [teamName, setTeamName] = useState("");
   const [company1, setCompany1] = useState("");
@@ -32,6 +38,114 @@ const CBLRegistrationForm = () => {
   ]);
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [isValidated, setIsValidated] = useState(false);
+
+  // Load data from session storage
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('cbl_registration_email');
+    if (savedEmail) {
+      setUserEmail(savedEmail);
+      setStep('form');
+      loadExistingRegistration(savedEmail);
+    }
+  }, []);
+
+  // Save to session storage whenever form data changes
+  useEffect(() => {
+    if (step === 'form' && userEmail) {
+      const formData = {
+        userEmail,
+        teamName,
+        company1,
+        hasSecondCompany,
+        company2,
+        players,
+        isValidated
+      };
+      localStorage.setItem('cbl_registration_data', JSON.stringify(formData));
+    }
+  }, [step, userEmail, teamName, company1, hasSecondCompany, company2, players, isValidated]);
+
+  const loadExistingRegistration = async (email: string) => {
+    try {
+      // First, find if there's a player with this email
+      const { data: playerData, error: playerError } = await supabase
+        .from('team_registration_players')
+        .select('registration_id')
+        .eq('email', email)
+        .limit(1)
+        .single();
+
+      if (playerData && !playerError) {
+        // Get the full registration with all players
+        const { data: registration, error } = await supabase
+          .from('team_registrations')
+          .select(`
+            *,
+            team_registration_players(*)
+          `)
+          .eq('id', playerData.registration_id)
+          .single();
+
+        if (registration && !error) {
+          setExistingRegistrationId(registration.id);
+          setTeamName(registration.team_name);
+          setCompany1(registration.company_1);
+          setHasSecondCompany(!!registration.company_2);
+          setCompany2(registration.company_2 || "");
+          
+          // Load players
+          const playersData = registration.team_registration_players.map((player: any, index: number) => ({
+            id: (index + 1).toString(),
+            fullName: player.full_name,
+            icPassport: player.ic_passport,
+            email: player.email,
+            phone: player.phone,
+            affiliation: player.affiliation
+          }));
+          setPlayers(playersData);
+          
+          toast({
+            title: "Registration loaded",
+            description: "We found your existing registration and loaded your data.",
+          });
+        }
+      } else {
+        // Load from session storage if no existing registration
+        const savedData = localStorage.getItem('cbl_registration_data');
+        if (savedData) {
+          const formData = JSON.parse(savedData);
+          if (formData.userEmail === email) {
+            setTeamName(formData.teamName || "");
+            setCompany1(formData.company1 || "");
+            setHasSecondCompany(formData.hasSecondCompany || false);
+            setCompany2(formData.company2 || "");
+            setPlayers(formData.players || [{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "" }]);
+            setIsValidated(formData.isValidated || false);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading existing registration:', error);
+    }
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userEmail.trim()) return;
+
+    setIsCheckingEmail(true);
+    localStorage.setItem('cbl_registration_email', userEmail);
+    
+    await loadExistingRegistration(userEmail);
+    setStep('form');
+    setIsCheckingEmail(false);
+  };
+
+  const backToEmail = () => {
+    setStep('email');
+    localStorage.removeItem('cbl_registration_email');
+    localStorage.removeItem('cbl_registration_data');
+  };
 
   // Dynamic affiliation options based on companies
   const getAffiliationOptions = () => {
@@ -148,27 +262,53 @@ const CBLRegistrationForm = () => {
     setIsSubmitting(true);
     
     try {
-      // Upload payment file
-      const paymentFileUrl = paymentFile ? await uploadPaymentFile(paymentFile) : null;
+      let registrationId = existingRegistrationId;
       
-      // Insert team registration
-      const { data: registration, error: regError } = await supabase
-        .from('team_registrations')
-        .insert({
-          team_name: teamName,
-          company_1: company1,
-          company_2: hasSecondCompany ? company2 : null,
-          payment_file_url: paymentFileUrl,
-          payment_file_name: paymentFile?.name || null
-        })
-        .select()
-        .single();
+      if (existingRegistrationId) {
+        // Update existing registration
+        const paymentFileUrl = paymentFile ? await uploadPaymentFile(paymentFile) : null;
+        
+        await supabase
+          .from('team_registrations')
+          .update({
+            team_name: teamName,
+            company_1: company1,
+            company_2: hasSecondCompany ? company2 : null,
+            payment_file_url: paymentFileUrl,
+            payment_file_name: paymentFile?.name || null,
+            total_players: players.length,
+            payment_file_size: paymentFile?.size || null 
+          })
+          .eq('id', existingRegistrationId);
 
-      if (regError) throw regError;
+        // Delete existing players and re-insert
+        await supabase
+          .from('team_registration_players')
+          .delete()
+          .eq('registration_id', existingRegistrationId);
+      } else {
+        // Create new registration
+        const paymentFileUrl = paymentFile ? await uploadPaymentFile(paymentFile) : null;
+        
+        const { data: registration, error: regError } = await supabase
+          .from('team_registrations')
+          .insert({
+            team_name: teamName,
+            company_1: company1,
+            company_2: hasSecondCompany ? company2 : null,
+            payment_file_url: paymentFileUrl,
+            payment_file_name: paymentFile?.name || null
+          })
+          .select()
+          .single();
+
+        if (regError) throw regError;
+        registrationId = registration.id;
+      }
 
       // Insert players
       const playersData = players.map((player, index) => ({
-        registration_id: registration.id,
+        registration_id: registrationId,
         full_name: player.fullName,
         ic_passport: player.icPassport,
         email: player.email,
@@ -190,22 +330,31 @@ const CBLRegistrationForm = () => {
           total_players: players.length,
           payment_file_size: paymentFile?.size || null 
         })
-        .eq('id', registration.id);
+        .eq('id', registrationId);
 
       // Sync to Google Sheets (async, don't wait for completion)
       supabase.functions.invoke('sync-to-google-sheets', {
-        body: { registrationId: registration.id }
+        body: { registrationId }
       }).catch(error => {
         console.error('Google Sheets sync failed:', error);
         // Don't show error to user, this is background operation
       });
 
       toast({
-        title: "Registration successful!",
-        description: "Your team has been registered for CBL 2025 Corporate Edition",
+        title: existingRegistrationId ? "Registration updated!" : "Registration successful!",
+        description: existingRegistrationId 
+          ? "Your team registration has been updated for CBL 2025 Corporate Edition"
+          : "Your team has been registered for CBL 2025 Corporate Edition",
       });
 
+      // Clear session storage
+      localStorage.removeItem('cbl_registration_email');
+      localStorage.removeItem('cbl_registration_data');
+      
       // Reset form
+      setStep('email');
+      setUserEmail("");
+      setExistingRegistrationId(null);
       setTeamName("");
       setCompany1("");
       setCompany2("");
@@ -225,6 +374,65 @@ const CBLRegistrationForm = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (step === 'email') {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        <div className="max-w-2xl mx-auto">
+          {/* Header with Logo */}
+          <div className="text-center mb-8">
+            <div className="flex flex-col items-center">
+              <img 
+                src="/lovable-uploads/cfe312a1-b4c2-4555-a995-829d97c3bc3d.png" 
+                alt="CBL Corporate Basketball League Logo" 
+                className="h-32 w-auto drop-shadow-lg mb-2"
+              />
+              <div className="text-4xl font-bold text-primary mb-4">2025</div>
+            </div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Corporate Edition</h1>
+            <p className="text-xl text-muted-foreground">Team Registration</p>
+          </div>
+
+          {/* Email Collection Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-6 w-6" />
+                Get Started
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleEmailSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="userEmail">Email Address *</Label>
+                  <Input
+                    id="userEmail"
+                    type="email"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    required
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    We'll use this email to save your progress and allow you to return to complete 
+                    your registration later. If you have an existing registration, we'll load it for you.
+                  </p>
+                </div>
+                
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={!userEmail.trim() || isCheckingEmail}
+                >
+                  {isCheckingEmail ? "Checking..." : "Continue to Registration"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -247,6 +455,29 @@ const CBLRegistrationForm = () => {
               Complete all sections to secure your spot in CBL 2025.
             </p>
           </div>
+          
+          {/* Email info and back button */}
+          <div className="mt-4 flex items-center justify-center gap-4 text-sm text-muted-foreground">
+            <span>Registration for: {userEmail}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={backToEmail}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Change Email
+            </Button>
+          </div>
+          
+          {existingRegistrationId && (
+            <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-800">
+                ✏️ You're editing an existing registration. Any changes will update your current submission.
+              </p>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -491,14 +722,17 @@ const CBLRegistrationForm = () => {
                 </Label>
               </div>
               
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={!isFormValid() || isSubmitting}
-                size="lg"
-              >
-                {isSubmitting ? "Submitting..." : "Submit Registration"}
-              </Button>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={!isFormValid() || isSubmitting}
+                  size="lg"
+                >
+                  {isSubmitting 
+                    ? (existingRegistrationId ? "Updating..." : "Submitting...") 
+                    : (existingRegistrationId ? "Update Registration" : "Submit Registration")
+                  }
+                </Button>
             </CardContent>
           </Card>
         </form>
