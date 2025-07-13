@@ -16,7 +16,8 @@ interface Player {
   icPassport: string;
   email: string;
   phone: string;
-  affiliation: string;
+  affiliation: string; // company_1 or company_2
+  relationshipType: string; // employee, contractor, etc.
 }
 
 const CBLRegistrationForm = () => {
@@ -31,7 +32,7 @@ const CBLRegistrationForm = () => {
   const [hasSecondCompany, setHasSecondCompany] = useState(false);
   const [company2, setCompany2] = useState("");
   const [players, setPlayers] = useState<Player[]>([
-    { id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "" }
+    { id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "employee" }
   ]);
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [isValidated, setIsValidated] = useState(false);
@@ -88,7 +89,8 @@ const CBLRegistrationForm = () => {
             icPassport: player.ic_passport,
             email: player.email,
             phone: player.phone,
-            affiliation: player.affiliation
+            affiliation: player.affiliation,
+            relationshipType: player.relationship_type || 'employee'
           }));
         setPlayers(playersData);
         
@@ -105,7 +107,7 @@ const CBLRegistrationForm = () => {
           setCompany1(formData.company1 || "");
           setHasSecondCompany(formData.hasSecondCompany || false);
           setCompany2(formData.company2 || "");
-          setPlayers(formData.players || [{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "" }]);
+          setPlayers(formData.players || [{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "employee" }]);
           setIsValidated(formData.isValidated || false);
         }
       }
@@ -116,18 +118,29 @@ const CBLRegistrationForm = () => {
 
   // Remove email handling functions as we now use authentication
 
-  // Dynamic affiliation options based on companies
-  const getAffiliationOptions = () => {
+  // Company affiliation options
+  const getCompanyOptions = () => {
     const options = [
-      { value: "company_1", label: `${company1 || "Company 1"} Employee` }
+      { value: "company_1", label: company1 || "Company 1" }
     ];
     
     if (hasSecondCompany && company2) {
-      options.push({ value: "company_2", label: `${company2} Employee` });
+      options.push({ value: "company_2", label: company2 });
     }
     
     return options;
   };
+
+  // Relationship type options
+  const getRelationshipTypeOptions = () => [
+    { value: "employee", label: "Employee" },
+    { value: "contractor", label: "Contractor" },
+    { value: "consultant", label: "Consultant" },
+    { value: "partner", label: "Partner" },
+    { value: "sponsor", label: "Sponsor" },
+    { value: "vendor", label: "Vendor" },
+    { value: "other", label: "Other" }
+  ];
 
   const addPlayer = () => {
     if (players.length < 15) {
@@ -137,7 +150,8 @@ const CBLRegistrationForm = () => {
         icPassport: "",
         email: "",
         phone: "",
-        affiliation: ""
+        affiliation: "",
+        relationshipType: "employee"
       };
       setPlayers([...players, newPlayer]);
     }
@@ -195,14 +209,15 @@ const CBLRegistrationForm = () => {
 
   const isFormValid = () => {
     const teamInfoValid = teamName.trim() && company1.trim() && (!hasSecondCompany || company2.trim());
-    const playersValid = players.every(player => 
-      player.fullName.trim() && 
-      player.icPassport.trim() && 
-      player.email.trim() && 
-      isWorkEmail(player.email) &&
-      player.phone.trim() && 
-      player.affiliation
-    );
+  const playersValid = players.every(player => 
+    player.fullName.trim() && 
+    player.icPassport.trim() && 
+    player.email.trim() && 
+    isWorkEmail(player.email) &&
+    player.phone.trim() && 
+    player.affiliation &&
+    player.relationshipType
+  );
     const paymentValid = paymentFile !== null;
     
     return teamInfoValid && playersValid && paymentValid && isValidated;
@@ -295,6 +310,7 @@ const CBLRegistrationForm = () => {
         email: player.email,
         phone: player.phone,
         affiliation: player.affiliation,
+        relationship_type: player.relationshipType as 'employee' | 'contractor' | 'consultant' | 'partner' | 'sponsor' | 'vendor' | 'other',
         player_order: index + 1
       }));
 
@@ -337,7 +353,7 @@ const CBLRegistrationForm = () => {
       setCompany1("");
       setCompany2("");
       setHasSecondCompany(false);
-      setPlayers([{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "" }]);
+      setPlayers([{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "employee" }]);
       setPaymentFile(null);
       setIsValidated(false);
       
@@ -537,17 +553,36 @@ const CBLRegistrationForm = () => {
                       />
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <Label htmlFor={`affiliation-${player.id}`}>Affiliation *</Label>
+                    <div>
+                      <Label htmlFor={`affiliation-${player.id}`}>Company Affiliation *</Label>
                       <Select
                         value={player.affiliation}
                         onValueChange={(value) => updatePlayer(player.id, 'affiliation', value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select player affiliation" />
+                          <SelectValue placeholder="Select company" />
                         </SelectTrigger>
                         <SelectContent>
-                          {getAffiliationOptions().map((option) => (
+                          {getCompanyOptions().map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`relationshipType-${player.id}`}>Relationship Type *</Label>
+                      <Select
+                        value={player.relationshipType}
+                        onValueChange={(value) => updatePlayer(player.id, 'relationshipType', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select relationship type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getRelationshipTypeOptions().map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>

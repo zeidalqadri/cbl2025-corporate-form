@@ -1388,6 +1388,7 @@ export type Database = {
           phone: string
           player_order: number
           registration_id: string
+          relationship_type: Database["public"]["Enums"]["affiliation_type"]
         }
         Insert: {
           affiliation: string
@@ -1399,6 +1400,7 @@ export type Database = {
           phone: string
           player_order: number
           registration_id: string
+          relationship_type?: Database["public"]["Enums"]["affiliation_type"]
         }
         Update: {
           affiliation?: string
@@ -1410,6 +1412,7 @@ export type Database = {
           phone?: string
           player_order?: number
           registration_id?: string
+          relationship_type?: Database["public"]["Enums"]["affiliation_type"]
         }
         Relationships: [
           {
@@ -3607,6 +3610,14 @@ export type Database = {
       }
     }
     Enums: {
+      affiliation_type:
+        | "employee"
+        | "contractor"
+        | "consultant"
+        | "partner"
+        | "sponsor"
+        | "vendor"
+        | "other"
       event_type:
         | "score"
         | "foul"
@@ -3765,6 +3776,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      affiliation_type: [
+        "employee",
+        "contractor",
+        "consultant",
+        "partner",
+        "sponsor",
+        "vendor",
+        "other",
+      ],
       event_type: [
         "score",
         "foul",
