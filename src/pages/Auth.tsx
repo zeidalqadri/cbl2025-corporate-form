@@ -95,7 +95,7 @@ const Auth = () => {
           <div className="flex flex-col items-center mb-4">
             <img 
               src="/lovable-uploads/cfe312a1-b4c2-4555-a995-829d97c3bc3d.png" 
-              alt="CBL Corporate Basketball League Logo" 
+              alt="CBL Logo" 
               className="h-24 w-auto drop-shadow-lg mb-2"
             />
             <div className="text-2xl font-bold text-primary">2025</div>
