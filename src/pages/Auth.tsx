@@ -135,7 +135,7 @@ const Auth = () => {
                     id="signup-name"
                     name="fullName"
                     type="text"
-                    placeholder="Your full name"
+                    placeholder="e.g., Ahmad bin Ali"
                     required
                   />
                 </div>

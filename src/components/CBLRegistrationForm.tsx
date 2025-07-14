@@ -471,7 +471,7 @@ const CBLRegistrationForm = () => {
                   id="teamName"
                   value={teamName}
                   onChange={(e) => setTeamName(e.target.value)}
-                  placeholder="Enter your team name"
+                  placeholder="e.g., Tech Innovators FC"
                   required
                 />
               </div>
@@ -482,7 +482,7 @@ const CBLRegistrationForm = () => {
                   id="company1"
                   value={company1}
                   onChange={(e) => setCompany1(e.target.value)}
-                  placeholder="Enter your company name"
+                  placeholder="e.g., Microsoft Malaysia Sdn Bhd"
                   required
                 />
               </div>
@@ -508,7 +508,7 @@ const CBLRegistrationForm = () => {
                     id="company2"
                     value={company2}
                     onChange={(e) => setCompany2(e.target.value)}
-                    placeholder="Enter second company name"
+                    placeholder="e.g., Google Malaysia Sdn Bhd"
                     required={hasSecondCompany}
                   />
                 </div>
@@ -552,7 +552,7 @@ const CBLRegistrationForm = () => {
                         id={`fullName-${player.id}`}
                         value={player.fullName}
                         onChange={(e) => updatePlayer(player.id, 'fullName', e.target.value)}
-                        placeholder="Enter full name"
+                        placeholder="e.g., Ahmad bin Ali"
                         required
                       />
                     </div>
@@ -563,7 +563,7 @@ const CBLRegistrationForm = () => {
                         id={`icPassport-${player.id}`}
                         value={player.icPassport}
                         onChange={(e) => updatePlayer(player.id, 'icPassport', e.target.value)}
-                        placeholder="Enter IC or passport number"
+                        placeholder="e.g., 990123-01-1234 or A12345678"
                         required
                       />
                     </div>
@@ -575,7 +575,7 @@ const CBLRegistrationForm = () => {
                         type="email"
                         value={player.email}
                         onChange={(e) => updatePlayer(player.id, 'email', e.target.value)}
-                        placeholder="Enter email address"
+                        placeholder="e.g., ahmad.ali@company.com"
                         required
                       />
                     </div>
@@ -586,7 +586,7 @@ const CBLRegistrationForm = () => {
                         id={`phone-${player.id}`}
                         value={player.phone}
                         onChange={(e) => updatePlayer(player.id, 'phone', e.target.value)}
-                        placeholder="Enter phone number"
+                        placeholder="e.g., +60123456789 or 0123456789"
                         required
                       />
                     </div>
