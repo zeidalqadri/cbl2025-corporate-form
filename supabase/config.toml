@@ -1,1 +1,199 @@
 project_id = "tnglzpywvtafomngxsgc"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[realtime]
+enabled = true
+ip_version = "ipv4"
+port = 54323
+max_header_length = 4096
+
+[studio]
+enabled = true
+port = 54324
+api_url = "http://127.0.0.1:54321"
+openai_api_key = "env(OPENAI_API_KEY)"
+
+[inbound_smtp]
+enabled = false
+port = 54325
+mailname = "localhost"
+
+[storage]
+enabled = true
+port = 54326
+file_size_limit = "50MiB"
+buckets = []
+
+[auth]
+enabled = true
+port = 54327
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+refresh_token_rotation_enabled = true
+security_update_password_require_reauthentication = true
+security_refresh_token_reuse_interval = 10
+security_captcha_enabled = false
+security_captcha_secret = "env(CAPTCHA_SECRET)"
+security_captcha_provider = "hcaptcha"
+external_email_enabled = true
+external_phone_enabled = true
+email_double_confirm_changes_enabled = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes_enabled = true
+enable_confirmations = false
+secure_password_change_enabled = true
+enable_anonymous_sign_ins = false
+minimum_password_length = 6
+
+[auth.sms]
+enable_signup = true
+enable_confirmations = true
+template = "Your code is {{ .Code }}"
+twilio_message_service_sid = "env(TWILIO_MESSAGE_SERVICE_SID)"
+twilio_account_sid = "env(TWILIO_ACCOUNT_SID)"
+twilio_auth_token = "env(TWILIO_AUTH_TOKEN)"
+
+[auth.external.apple]
+enabled = false
+client_id = "env(APPLE_CLIENT_ID)"
+secret = "env(APPLE_SECRET)"
+redirect_uri = "env(APPLE_REDIRECT_URI)"
+
+[auth.external.azure]
+enabled = false
+client_id = "env(AZURE_CLIENT_ID)"
+secret = "env(AZURE_SECRET)"
+redirect_uri = "env(AZURE_REDIRECT_URI)"
+
+[auth.external.bitbucket]
+enabled = false
+client_id = "env(BITBUCKET_CLIENT_ID)"
+secret = "env(BITBUCKET_SECRET)"
+redirect_uri = "env(BITBUCKET_REDIRECT_URI)"
+
+[auth.external.discord]
+enabled = false
+client_id = "env(DISCORD_CLIENT_ID)"
+secret = "env(DISCORD_SECRET)"
+redirect_uri = "env(DISCORD_REDIRECT_URI)"
+
+[auth.external.facebook]
+enabled = false
+client_id = "env(FACEBOOK_CLIENT_ID)"
+secret = "env(FACEBOOK_SECRET)"
+redirect_uri = "env(FACEBOOK_REDIRECT_URI)"
+
+[auth.external.figma]
+enabled = false
+client_id = "env(FIGMA_CLIENT_ID)"
+secret = "env(FIGMA_SECRET)"
+redirect_uri = "env(FIGMA_REDIRECT_URI)"
+
+[auth.external.github]
+enabled = false
+client_id = "env(GITHUB_CLIENT_ID)"
+secret = "env(GITHUB_SECRET)"
+redirect_uri = "env(GITHUB_REDIRECT_URI)"
+
+[auth.external.gitlab]
+enabled = false
+client_id = "env(GITLAB_CLIENT_ID)"
+secret = "env(GITLAB_SECRET)"
+redirect_uri = "env(GITLAB_REDIRECT_URI)"
+
+[auth.external.google]
+enabled = false
+client_id = "env(GOOGLE_CLIENT_ID)"
+secret = "env(GOOGLE_SECRET)"
+redirect_uri = "env(GOOGLE_REDIRECT_URI)"
+
+[auth.external.keycloak]
+enabled = false
+client_id = "env(KEYCLOAK_CLIENT_ID)"
+secret = "env(KEYCLOAK_SECRET)"
+redirect_uri = "env(KEYCLOAK_REDIRECT_URI)"
+url = "env(KEYCLOAK_URL)"
+
+[auth.external.linkedin]
+enabled = false
+client_id = "env(LINKEDIN_CLIENT_ID)"
+secret = "env(LINKEDIN_SECRET)"
+redirect_uri = "env(LINKEDIN_REDIRECT_URI)"
+
+[auth.external.notion]
+enabled = false
+client_id = "env(NOTION_CLIENT_ID)"
+secret = "env(NOTION_SECRET)"
+redirect_uri = "env(NOTION_REDIRECT_URI)"
+
+[auth.external.twitch]
+enabled = false
+client_id = "env(TWITCH_CLIENT_ID)"
+secret = "env(TWITCH_SECRET)"
+redirect_uri = "env(TWITCH_REDIRECT_URI)"
+
+[auth.external.twitter]
+enabled = false
+client_id = "env(TWITTER_CLIENT_ID)"
+secret = "env(TWITTER_SECRET)"
+redirect_uri = "env(TWITTER_REDIRECT_URI)"
+
+[auth.external.slack]
+enabled = false
+client_id = "env(SLACK_CLIENT_ID)"
+secret = "env(SLACK_SECRET)"
+redirect_uri = "env(SLACK_REDIRECT_URI)"
+
+[auth.external.spotify]
+enabled = false
+client_id = "env(SPOTIFY_CLIENT_ID)"
+secret = "env(SPOTIFY_SECRET)"
+redirect_uri = "env(SPOTIFY_REDIRECT_URI)"
+
+[auth.external.workos]
+enabled = false
+client_id = "env(WORKOS_CLIENT_ID)"
+secret = "env(WORKOS_SECRET)"
+redirect_uri = "env(WORKOS_REDIRECT_URI)"
+url = "env(WORKOS_URL)"
+
+[auth.external.zoom]
+enabled = false
+client_id = "env(ZOOM_CLIENT_ID)"
+secret = "env(ZOOM_SECRET)"
+redirect_uri = "env(ZOOM_REDIRECT_URI)"
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+inspector_port = 8083
+
+[functions.send-cbl-email]
+verify_jwt = false
+
+[analytics]
+enabled = false
+port = 54327
+vector_port = 54328
+gw_mode = "disabled"
