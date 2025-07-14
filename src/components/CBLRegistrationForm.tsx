@@ -9,6 +9,7 @@ import { Trash2, Plus, Upload, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { BasketballCourtTracker } from "./BasketballCourtTracker";
 
 interface Player {
   id: string;
@@ -398,6 +399,16 @@ const CBLRegistrationForm = () => {
 
   return (
     <div className="bg-background p-4">
+      {/* Basketball Court Tracker */}
+      <BasketballCourtTracker
+        players={players}
+        teamName={teamName}
+        company1={company1}
+        company2={company2}
+        paymentFile={paymentFile}
+        isValidated={isValidated}
+      />
+      
       <div className="max-w-4xl mx-auto">
         {/* Header with Logo */}
         <div className="text-center mb-8">
