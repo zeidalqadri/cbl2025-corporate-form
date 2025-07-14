@@ -89,7 +89,7 @@ const Auth = () => {
             <div className="text-2xl font-bold text-primary">2025</div>
             <div className="text-lg font-semibold text-muted-foreground mt-1">Corporate Edition</div>
           </div>
-          <CardDescription>Registration</CardDescription>
+          <CardDescription>Team Registration</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
