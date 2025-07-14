@@ -68,51 +68,44 @@ export const BasketballCourtTracker: React.FC<BasketballCourtTrackerProps> = ({
         </div>
       </div>
       
-      {/* Progress Indicators */}
-      <div className="space-y-3 mb-6">
-        <ProgressIndicator
-          label="Team Info"
-          complete={!!teamInfoComplete}
-          description={`${teamName ? '✓' : '✗'} Team name, ${company1 ? '✓' : '✗'} Primary company`}
-        />
-        <ProgressIndicator
-          label="Players"
-          complete={filledPlayers >= 15}
-          description={`${filledPlayers}/15 players registered`}
-          progress={playerProgress}
-        />
-        <ProgressIndicator
-          label="Payment"
-          complete={paymentComplete}
-          description={paymentFile ? '✓ Payment file uploaded' : '✗ Payment file required'}
-        />
-        <ProgressIndicator
-          label="Validation"
-          complete={isValidated}
-          description={isValidated ? '✓ Form validated' : 'Complete all sections'}
-        />
+      {/* Progress Rail */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-500"
+              style={{ width: `${Math.min((filledPlayers + (teamInfoComplete ? 5 : 0) + (paymentComplete ? 5 : 0) + (isValidated ? 5 : 0)) / 30 * 100, 100)}%` }}
+            />
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {Math.round((filledPlayers + (teamInfoComplete ? 5 : 0) + (paymentComplete ? 5 : 0) + (isValidated ? 5 : 0)) / 30 * 100)}%
+          </span>
+        </div>
       </div>
       
       {/* Basketball Court */}
-      <div className="bg-gradient-to-b from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg p-4 border">
+      <div className="bg-gradient-to-b from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 rounded-lg p-4 border">
         <svg viewBox="0 0 200 120" className="w-full h-48">
-          {/* Court outline */}
-          <rect x="10" y="10" width="180" height="100" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
+          {/* Court outline - half court */}
+          <rect x="10" y="10" width="180" height="100" fill="#D2B48C" stroke="hsl(var(--border))" strokeWidth="2" />
           
-          {/* Center circle */}
-          <circle cx="100" cy="60" r="15" fill="none" stroke="hsl(var(--border))" strokeWidth="1.5" />
+          {/* Center line */}
+          <line x1="100" y1="10" x2="100" y2="110" stroke="hsl(var(--border))" strokeWidth="2" />
           
-          {/* Three-point line (simplified arc) */}
-          <path d="M 30 30 Q 100 10 170 30" fill="none" stroke="hsl(var(--border))" strokeWidth="1.5" />
+          {/* Center circle (half) */}
+          <path d="M 100 45 A 15 15 0 0 1 100 75" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
+          
+          {/* Three-point arc */}
+          <path d="M 130 30 A 40 40 0 0 1 130 90" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
           
           {/* Free throw line */}
-          <line x1="70" y1="85" x2="130" y2="85" stroke="hsl(var(--border))" strokeWidth="1.5" />
+          <line x1="150" y1="45" x2="150" y2="75" stroke="hsl(var(--border))" strokeWidth="2" />
           
           {/* Key/Paint area */}
-          <rect x="70" y="85" width="60" height="25" fill="none" stroke="hsl(var(--border))" strokeWidth="1.5" />
+          <rect x="150" y="45" width="40" height="30" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
           
-          {/* Hoop */}
-          <circle cx="100" cy="97" r="3" fill="hsl(var(--destructive))" />
+          {/* Basket */}
+          <circle cx="185" cy="60" r="4" fill="hsl(var(--destructive))" stroke="hsl(var(--border))" strokeWidth="1" />
           
           {/* Player positions */}
           {allPositions.map((position, index) => {
