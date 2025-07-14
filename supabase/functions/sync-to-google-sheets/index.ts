@@ -6,6 +6,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+interface DatabasePlayer {
+  id: string;
+  player_order: number;
+  full_name: string;
+  ic_passport: string;
+  email: string;
+  phone: string;
+  affiliation: string;
+  relationship_type: string;
+}
+
 interface RegistrationData {
   id: string;
   team_name: string;
@@ -15,6 +26,7 @@ interface RegistrationData {
   payment_file_url: string | null;
   total_players: number;
   created_at: string;
+  team_registration_players: DatabasePlayer[];
   players: Array<{
     full_name: string;
     ic_passport: string;
@@ -59,12 +71,12 @@ serve(async (req) => {
 
     // Sort players by order
     const sortedPlayers = registration.team_registration_players.sort(
-      (a: any, b: any) => a.player_order - b.player_order
+      (a: DatabasePlayer, b: DatabasePlayer) => a.player_order - b.player_order
     )
 
     // Format players list for Google Sheets
     const playersText = sortedPlayers
-      .map((player: any, index: number) => 
+      .map((player: DatabasePlayer, index: number) => 
         `${index + 1}. ${player.full_name} (${player.ic_passport}) - ${player.email} - ${player.phone} - ${player.affiliation}`
       )
       .join('\n')

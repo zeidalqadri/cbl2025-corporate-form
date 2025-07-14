@@ -16,7 +16,7 @@ const corsHeaders = {
 interface EmailRequest {
   type: 'welcome' | 'magic-link';
   to: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -76,10 +76,11 @@ const handler = async (req: Request): Promise<Response> => {
         ...corsHeaders,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in send-cbl-email function:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

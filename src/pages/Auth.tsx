@@ -55,18 +55,6 @@ const Auth = () => {
     const password = formData.get('password') as string;
     const fullName = formData.get('fullName') as string;
 
-    // Validate work email (no personal domains)
-    const personalDomains = [
-      'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com',
-      'protonmail.com', 'tutanota.com', 'zoho.com', 'yandex.com', 'mail.com'
-    ];
-    
-    const emailDomain = email.split('@')[1]?.toLowerCase();
-    if (personalDomains.includes(emailDomain)) {
-      setError('Please use a corporate/work email address. Personal email domains are not allowed for this corporate league.');
-      setIsLoading(false);
-      return;
-    }
 
     const { error } = await signUp(email, password, fullName);
     
@@ -74,7 +62,7 @@ const Auth = () => {
       console.error('Sign up error:', error);
       setError(error.message || error.toString() || 'Sign up failed. Please try again.');
     } else {
-      setSuccess('Please check your email to confirm your account.');
+      setSuccess('🏀 Welcome to CBL 2025! We\'ve sent you a verification email. Please check your inbox and click the link to activate your account and start building your championship team!');
     }
     
     setIsLoading(false);

@@ -117,3 +117,69 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Basketball Court Tracker Animations */
+@keyframes player-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    r: 4;
+    opacity: 0.8;
+  }
+  50% {
+    r: 8;
+    opacity: 0.4;
+  }
+  100% {
+    r: 12;
+    opacity: 0;
+  }
+}
+
+@keyframes court-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px hsl(24 100% 50% / 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px hsl(24 100% 50% / 0.5));
+  }
+}
+
+@keyframes progress-fill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--progress-value);
+  }
+}
+
+/* Basketball Court Responsive Animations */
+@media (max-width: 768px) {
+  @keyframes player-pulse {
+    0%, 100% { 
+      transform: scale(1);
+    }
+    50% { 
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* Smooth transitions for basketball court tracker */
+.basketball-court-tracker {
+  transition: all 0.3s ease-in-out;
+}
+
+.basketball-court-tracker:hover {
+  animation: court-glow 2s ease-in-out infinite;
+}

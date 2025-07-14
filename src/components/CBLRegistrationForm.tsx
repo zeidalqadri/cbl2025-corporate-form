@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,8 @@ import { Trash2, Plus, Upload, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { BasketballCourtTracker } from "./BasketballCourtTracker";
+import { MobileCourtTracker } from "./MobileCourtTracker";
 
 interface Player {
   id: string;
@@ -18,6 +20,27 @@ interface Player {
   phone: string;
   affiliation: string; // company_1 or company_2
   relationshipType: string; // employee, contractor, etc.
+}
+
+interface DatabasePlayer {
+  id: string;
+  player_order: number;
+  full_name: string;
+  ic_passport: string;
+  email: string;
+  phone: string;
+  affiliation: string;
+  relationship_type: string;
+}
+
+interface TeamRegistration {
+  id: string;
+  user_id: string;
+  team_name: string;
+  company_1: string;
+  company_2: string | null;
+  payment_file_name: string | null;
+  team_registration_players: DatabasePlayer[];
 }
 
 const CBLRegistrationForm = () => {
@@ -37,13 +60,6 @@ const CBLRegistrationForm = () => {
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [isValidated, setIsValidated] = useState(false);
 
-  // Load existing registration on mount
-  useEffect(() => {
-    if (user?.email) {
-      loadExistingRegistration();
-    }
-  }, [user]);
-
   // Save to localStorage whenever form data changes
   useEffect(() => {
     if (user?.email) {
@@ -60,7 +76,8 @@ const CBLRegistrationForm = () => {
     }
   }, [user, teamName, company1, hasSecondCompany, company2, players, isValidated, paymentFile]);
 
-  const loadExistingRegistration = async () => {
+  // Define loadExistingRegistration function before using it in useEffect
+  const loadExistingRegistration = useCallback(async () => {
     if (!user?.id) return;
     
     try {
@@ -83,8 +100,8 @@ const CBLRegistrationForm = () => {
         
         // Load players
         const playersData = registration.team_registration_players
-          .sort((a: any, b: any) => a.player_order - b.player_order)
-          .map((player: any, index: number) => ({
+          .sort((a: DatabasePlayer, b: DatabasePlayer) => a.player_order - b.player_order)
+          .map((player: DatabasePlayer, index: number) => ({
             id: (index + 1).toString(),
             fullName: player.full_name,
             icPassport: player.ic_passport,
@@ -139,7 +156,14 @@ const CBLRegistrationForm = () => {
     } catch (error) {
       console.error('Error loading existing registration:', error);
     }
-  };
+  }, [user, toast]);
+
+  // Load existing registration on mount
+  useEffect(() => {
+    if (user?.email) {
+      loadExistingRegistration();
+    }
+  }, [user, loadExistingRegistration]);
 
   // Remove email handling functions as we now use authentication
 
@@ -223,7 +247,7 @@ const CBLRegistrationForm = () => {
 
   const isFormValid = () => {
     const teamInfoValid = teamName.trim() && company1.trim() && (!hasSecondCompany || company2.trim());
-    const playersValid = players.every(player => 
+    const completedPlayers = players.filter(player => 
       player.fullName.trim() && 
       player.icPassport.trim() && 
       player.email.trim() && 
@@ -231,6 +255,7 @@ const CBLRegistrationForm = () => {
       player.affiliation &&
       player.relationshipType
     );
+    const playersValid = completedPlayers.length >= 5; // Minimum 5 players required
     const paymentValid = paymentFile !== null;
     
     return teamInfoValid && playersValid && paymentValid && isValidated;
@@ -370,20 +395,23 @@ const CBLRegistrationForm = () => {
       setPaymentFile(null);
       setIsValidated(false);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error submitting form:', error);
       
       let errorMessage = "There was an error submitting your registration. Please try again.";
       
       // Handle specific database constraint violations
-      if (error?.message?.includes('valid_email')) {
-        errorMessage = "Please check that all email addresses are in valid format (e.g., name@company.com).";
-      } else if (error?.message?.includes('valid_phone')) {
-        errorMessage = "Please check that all phone numbers are in valid format (e.g., +60123456789 or 0123456789).";
-      } else if (error?.message?.includes('affiliation')) {
-        errorMessage = "Player affiliation must match one of the company names.";
-      } else if (error?.message) {
-        errorMessage = error.message;
+      if (error && typeof error === 'object' && 'message' in error) {
+        const errorObj = error as { message: string };
+        if (errorObj.message?.includes('valid_email')) {
+          errorMessage = "Please check that all email addresses are in valid format (e.g., name@company.com).";
+        } else if (errorObj.message?.includes('valid_phone')) {
+          errorMessage = "Please check that all phone numbers are in valid format (e.g., +60123456789 or 0123456789).";
+        } else if (errorObj.message?.includes('affiliation')) {
+          errorMessage = "Player affiliation must match one of the company names.";
+        } else if (errorObj.message) {
+          errorMessage = errorObj.message;
+        }
       }
       
       toast({
@@ -493,12 +521,15 @@ const CBLRegistrationForm = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">2</span>
-                Player Details ({players.length}/15)
+                Player Details ({players.filter(p => p.fullName.trim()).length}/15)
+                <span className="text-sm font-normal text-muted-foreground">
+                  (Minimum 5 required)
+                </span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {players.map((player, index) => (
-                <div key={player.id} className="p-4 border border-border rounded-lg space-y-4">
+                <div key={player.id} id={`player-${player.id}`} className="p-4 border border-border rounded-lg space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="font-semibold">Player {index + 1}</h4>
                     {players.length > 1 && (
@@ -612,6 +643,28 @@ const CBLRegistrationForm = () => {
                   Add Player
                 </Button>
               )}
+              
+              {/* Player count status */}
+              <div className="mt-4 p-3 rounded-lg bg-muted">
+                <p className="text-sm">
+                  {(() => {
+                    const completedCount = players.filter(p => p.fullName.trim()).length;
+                    if (completedCount < 5) {
+                      return (
+                        <span className="text-amber-600">
+                          ⚠️ You need at least 5 completed players to submit ({completedCount}/5)
+                        </span>
+                      );
+                    } else {
+                      return (
+                        <span className="text-green-600">
+                          ✅ Player minimum met ({completedCount}/15)
+                        </span>
+                      );
+                    }
+                  })()}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -703,6 +756,35 @@ const CBLRegistrationForm = () => {
           </Card>
         </form>
       </div>
+
+      {/* Desktop Basketball Court Tracker */}
+      <BasketballCourtTracker
+        players={players}
+        teamName={teamName}
+        company1={company1}
+        company2={company2}
+        hasSecondCompany={hasSecondCompany}
+        paymentUploaded={!!paymentFile}
+        isValidated={isValidated}
+        onPlayerClick={(playerId) => {
+          // Scroll to player form
+          const playerElement = document.getElementById(`player-${playerId}`);
+          if (playerElement) {
+            playerElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }}
+      />
+
+      {/* Mobile Basketball Court Tracker */}
+      <MobileCourtTracker
+        players={players}
+        teamName={teamName}
+        company1={company1}
+        company2={company2}
+        hasSecondCompany={hasSecondCompany}
+        paymentUploaded={!!paymentFile}
+        isValidated={isValidated}
+      />
     </div>
   );
 };
