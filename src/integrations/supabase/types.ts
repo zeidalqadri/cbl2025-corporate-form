@@ -3610,14 +3610,7 @@ export type Database = {
       }
     }
     Enums: {
-      affiliation_type:
-        | "employee"
-        | "contractor"
-        | "consultant"
-        | "partner"
-        | "sponsor"
-        | "vendor"
-        | "other"
+      affiliation_type: "permanent" | "contract" | "intern" | "agent" | "member"
       event_type:
         | "score"
         | "foul"
@@ -3776,15 +3769,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      affiliation_type: [
-        "employee",
-        "contractor",
-        "consultant",
-        "partner",
-        "sponsor",
-        "vendor",
-        "other",
-      ],
+      affiliation_type: ["permanent", "contract", "intern", "agent", "member"],
       event_type: [
         "score",
         "foul",

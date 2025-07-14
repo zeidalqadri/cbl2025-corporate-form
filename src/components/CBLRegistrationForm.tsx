@@ -32,7 +32,7 @@ const CBLRegistrationForm = () => {
   const [hasSecondCompany, setHasSecondCompany] = useState(false);
   const [company2, setCompany2] = useState("");
   const [players, setPlayers] = useState<Player[]>([
-    { id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "employee" }
+    { id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "permanent" }
   ]);
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [isValidated, setIsValidated] = useState(false);
@@ -91,7 +91,7 @@ const CBLRegistrationForm = () => {
             email: player.email,
             phone: player.phone,
             affiliation: player.affiliation,
-            relationshipType: player.relationship_type || 'employee'
+            relationshipType: player.relationship_type || 'permanent'
           }));
         setPlayers(playersData);
         
@@ -120,7 +120,7 @@ const CBLRegistrationForm = () => {
           setCompany1(formData.company1 || "");
           setHasSecondCompany(formData.hasSecondCompany || false);
           setCompany2(formData.company2 || "");
-          setPlayers(formData.players || [{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "employee" }]);
+          setPlayers(formData.players || [{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "permanent" }]);
           setIsValidated(formData.isValidated || false);
           
           // Restore payment file name if exists
@@ -158,13 +158,11 @@ const CBLRegistrationForm = () => {
 
   // Relationship type options
   const getRelationshipTypeOptions = () => [
-    { value: "employee", label: "Employee" },
-    { value: "contractor", label: "Contractor" },
-    { value: "consultant", label: "Consultant" },
-    { value: "partner", label: "Partner" },
-    { value: "sponsor", label: "Sponsor" },
-    { value: "vendor", label: "Vendor" },
-    { value: "other", label: "Other" }
+    { value: "permanent", label: "Permanent" },
+    { value: "contract", label: "Contract" },
+    { value: "intern", label: "Intern" },
+    { value: "agent", label: "Agent" },
+    { value: "member", label: "Member" }
   ];
 
   const addPlayer = () => {
@@ -176,7 +174,7 @@ const CBLRegistrationForm = () => {
         email: "",
         phone: "",
         affiliation: "",
-        relationshipType: "employee"
+        relationshipType: "permanent"
       };
       setPlayers([...players, newPlayer]);
     }
@@ -222,27 +220,17 @@ const CBLRegistrationForm = () => {
     }
   };
 
-  const isWorkEmail = (email: string) => {
-    const personalDomains = [
-      'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
-      'icloud.com', 'protonmail.com', 'aol.com', 'me.com', 'msn.com'
-    ];
-    
-    const domain = email.split('@')[1]?.toLowerCase();
-    return domain && !personalDomains.includes(domain);
-  };
 
   const isFormValid = () => {
     const teamInfoValid = teamName.trim() && company1.trim() && (!hasSecondCompany || company2.trim());
-  const playersValid = players.every(player => 
-    player.fullName.trim() && 
-    player.icPassport.trim() && 
-    player.email.trim() && 
-    isWorkEmail(player.email) &&
-    player.phone.trim() && 
-    player.affiliation &&
-    player.relationshipType
-  );
+    const playersValid = players.every(player => 
+      player.fullName.trim() && 
+      player.icPassport.trim() && 
+      player.email.trim() && 
+      player.phone.trim() && 
+      player.affiliation &&
+      player.relationshipType
+    );
     const paymentValid = paymentFile !== null;
     
     return teamInfoValid && playersValid && paymentValid && isValidated;
@@ -335,7 +323,7 @@ const CBLRegistrationForm = () => {
         email: player.email,
         phone: player.phone,
         affiliation: player.affiliation,
-        relationship_type: player.relationshipType as 'employee' | 'contractor' | 'consultant' | 'partner' | 'sponsor' | 'vendor' | 'other',
+        relationship_type: player.relationshipType as 'permanent' | 'contract' | 'intern' | 'agent' | 'member',
         player_order: index + 1
       }));
 
@@ -378,7 +366,7 @@ const CBLRegistrationForm = () => {
       setCompany1("");
       setCompany2("");
       setHasSecondCompany(false);
-      setPlayers([{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "employee" }]);
+      setPlayers([{ id: "1", fullName: "", icPassport: "", email: "", phone: "", affiliation: "", relationshipType: "permanent" }]);
       setPaymentFile(null);
       setIsValidated(false);
       
@@ -550,21 +538,15 @@ const CBLRegistrationForm = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor={`email-${player.id}`}>Work Email *</Label>
+                      <Label htmlFor={`email-${player.id}`}>Email *</Label>
                       <Input
                         id={`email-${player.id}`}
                         type="email"
                         value={player.email}
                         onChange={(e) => updatePlayer(player.id, 'email', e.target.value)}
-                        placeholder="Enter work email address"
-                        className={player.email && !isWorkEmail(player.email) ? "border-destructive" : ""}
+                        placeholder="Enter email address"
                         required
                       />
-                      {player.email && !isWorkEmail(player.email) && (
-                        <p className="text-xs text-destructive mt-1">
-                          Please use a work email (no personal emails like Gmail, Yahoo, etc.)
-                        </p>
-                      )}
                     </div>
                     
                     <div>
