@@ -3,7 +3,11 @@ import React from 'react';
 interface Player {
   id: string;
   fullName: string;
+  icPassport: string;
+  email: string;
+  phone: string;
   affiliation: string;
+  relationshipType: string;
 }
 
 interface CourtPlayerProps {
@@ -23,7 +27,11 @@ export const CourtPlayer: React.FC<CourtPlayerProps> = ({
   position,
   isStarter,
 }) => {
-  const hasPlayer = player.fullName.trim();
+  const hasPlayer = player.fullName.trim() && 
+                   player.icPassport.trim() && 
+                   player.email.trim() && 
+                   player.phone.trim() && 
+                   player.affiliation.trim();
   const initials = hasPlayer 
     ? player.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
     : position;

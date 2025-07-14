@@ -5,7 +5,11 @@ import { ProgressIndicator } from './ProgressIndicator';
 interface Player {
   id: string;
   fullName: string;
+  icPassport: string;
+  email: string;
+  phone: string;
   affiliation: string;
+  relationshipType: string;
 }
 
 interface BasketballCourtTrackerProps {
@@ -27,7 +31,13 @@ export const BasketballCourtTracker: React.FC<BasketballCourtTrackerProps> = ({
 }) => {
   // Calculate progress metrics
   const totalPlayers = 15;
-  const filledPlayers = players.filter(p => p.fullName.trim()).length;
+  const filledPlayers = players.filter(p => 
+    p.fullName.trim() && 
+    p.icPassport.trim() && 
+    p.email.trim() && 
+    p.phone.trim() && 
+    p.affiliation.trim()
+  ).length;
   const playerProgress = (filledPlayers / totalPlayers) * 100;
   
   const teamInfoComplete = teamName.trim() && company1.trim();
@@ -52,7 +62,13 @@ export const BasketballCourtTracker: React.FC<BasketballCourtTrackerProps> = ({
   
   // Determine player color based on affiliation
   const getPlayerColor = (player: Player) => {
-    if (!player.fullName.trim()) return 'gray';
+    const isComplete = player.fullName.trim() && 
+                      player.icPassport.trim() && 
+                      player.email.trim() && 
+                      player.phone.trim() && 
+                      player.affiliation.trim();
+    
+    if (!isComplete) return 'gray';
     if (player.affiliation === company1) return 'hsl(var(--primary))';
     if (player.affiliation === company2) return 'hsl(var(--secondary))';
     return 'hsl(var(--accent))';
@@ -109,7 +125,15 @@ export const BasketballCourtTracker: React.FC<BasketballCourtTrackerProps> = ({
           
           {/* Player positions */}
           {allPositions.map((position, index) => {
-            const player = players[index] || { id: `empty-${index}`, fullName: '', affiliation: '' };
+            const player = players[index] || { 
+              id: `empty-${index}`, 
+              fullName: '', 
+              icPassport: '', 
+              email: '', 
+              phone: '', 
+              affiliation: '', 
+              relationshipType: '' 
+            };
             return (
               <CourtPlayer
                 key={`position-${index}`}
