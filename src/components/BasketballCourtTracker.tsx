@@ -85,27 +85,27 @@ export const BasketballCourtTracker: React.FC<BasketballCourtTrackerProps> = ({
       
       {/* Basketball Court */}
       <div className="bg-gradient-to-b from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 rounded-lg p-4 border">
-        <svg viewBox="0 0 200 120" className="w-full h-48">
-          {/* Court outline - half court */}
-          <rect x="10" y="10" width="180" height="100" fill="#D2B48C" stroke="hsl(var(--border))" strokeWidth="2" />
+        <svg viewBox="0 0 120 120" className="w-full h-48">
+          {/* Half court outline */}
+          <rect x="10" y="10" width="100" height="100" fill="#D2B48C" stroke="hsl(var(--border))" strokeWidth="2" />
           
-          {/* Center line */}
-          <line x1="100" y1="10" x2="100" y2="110" stroke="hsl(var(--border))" strokeWidth="2" />
+          {/* Center line (left side) */}
+          <line x1="10" y1="10" x2="10" y2="110" stroke="hsl(var(--border))" strokeWidth="2" />
           
-          {/* Center circle (half) */}
-          <path d="M 100 45 A 15 15 0 0 1 100 75" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
+          {/* Center circle (quarter) */}
+          <path d="M 10 45 A 15 15 0 0 1 10 75" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
           
           {/* Three-point arc */}
-          <path d="M 130 30 A 40 40 0 0 1 130 90" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
+          <path d="M 40 25 A 40 40 0 0 1 40 95" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
           
           {/* Free throw line */}
-          <line x1="150" y1="45" x2="150" y2="75" stroke="hsl(var(--border))" strokeWidth="2" />
+          <line x1="60" y1="45" x2="60" y2="75" stroke="hsl(var(--border))" strokeWidth="2" />
           
           {/* Key/Paint area */}
-          <rect x="150" y="45" width="40" height="30" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
+          <rect x="60" y="45" width="50" height="30" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
           
           {/* Basket */}
-          <circle cx="185" cy="60" r="4" fill="hsl(var(--destructive))" stroke="hsl(var(--border))" strokeWidth="1" />
+          <circle cx="105" cy="60" r="4" fill="hsl(var(--destructive))" stroke="hsl(var(--border))" strokeWidth="1" />
           
           {/* Player positions */}
           {allPositions.map((position, index) => {
